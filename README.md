@@ -1,85 +1,112 @@
-# ParaBank — Automatización de pruebas
+# ParaBank - Automatización de pruebas
 
-Proyecto de automatización para el portal bancario **ParaBank**, desarrollado con **Java 21, Playwright y Cucumber**, utilizando el patrón **Page Object Model**.
+Proyecto de automatización de pruebas para el portal bancario **ParaBank**, desarrollado con **Java 21, Playwright y Cucumber**, utilizando el patrón **Page Object Model (POM)**.
 
-La automatización cubre las principales operaciones solicitadas: **registro, login, transferencia y retiro**, combinando pruebas de interfaz y API cuando es necesario.
-
----
-
-## Lo que hace este proyecto
-
-La suite permite probar:
-
-* Registro de nuevos usuarios.
-* Validaciones del formulario de registro.
-* Inicio de sesión.
-* Transferencias entre cuentas.
-* Retiro mediante API.
-* Validación de saldos.
-* Comportamientos defectuosos encontrados en el portal.
-
-Los datos de prueba se generan automáticamente para evitar depender de usuarios o cuentas creadas anteriormente.
+La suite cubre las funcionalidades de **registro, inicio de sesión, transferencia y retiro**, utilizando pruebas UI y API según la operación a validar.
 
 ---
 
-## ANTES DE EJECUTAR
+## Tecnologías utilizadas
 
-Se necesita:
+| Tecnología | Versión / Uso |
+|---|---|
+| Java | 21 |
+| Maven | 3.9+ |
+| Playwright | Automatización UI y API |
+| Cucumber | BDD / Gherkin |
+| JUnit | Ejecución de pruebas |
+| Page Object Model | Diseño de la automatización |
 
-| Herramienta | Versión                           |
-| ----------- | --------------------------------- |
-| Java        | 21                                |
-| Maven       | 3.9+                              |
-| Playwright    |Se instala mediante las dependencias del proyecto|
-	
-El proyecto utiliza el portal:
+### Aplicación bajo prueba
 
-```text
-https://parabank.parasoft.com/parabank/index.htm
-```
+[ParaBank](https://parabank.parasoft.com/parabank/index.htm)
 
-Los navegadores de Playwright se descargan automáticamente.
+---
 
-La configuración principal está en:
+## Funcionalidades automatizadas
+
+La suite incluye escenarios para:
+
+- Registro de nuevos usuarios.
+- Validaciones del formulario de registro.
+- Inicio de sesión.
+- Transferencia entre cuentas.
+- Retiro mediante API.
+- Validación de saldos.
+- Validación de comportamientos defectuosos identificados durante las pruebas.
+
+Los escenarios utilizan datos generados durante la ejecución para reducir la dependencia de información previamente creada en el ambiente.
+
+---
+
+## Requisitos previos
+
+Antes de ejecutar el proyecto se requiere:
+
+- Java JDK 21.
+- Maven 3.9 o superior.
+- Acceso a Internet.
+- Acceso al ambiente público de ParaBank.
+
+Los navegadores requeridos por Playwright se descargan automáticamente según la configuración del proyecto.
+
+La configuración principal se encuentra en:
 
 ```text
 src/test/resources/config.properties
 ```
 
-Los valores también pueden sobrescribirse mediante `-D`.
+Los valores de configuración también pueden sobrescribirse mediante propiedades de Maven.
 
 ---
 
-## CÓMO EJECUTAR
+## Ejecución
 
-Para ejecutar toda la suite:
+### Ejecutar toda la suite
 
 ```bash
 mvn test
 ```
 
-Para ejecutar viendo el navegador:
+### Ejecutar con el navegador visible
 
 ```bash
 mvn test -Dheadless=false
 ```
 
-Por funcionalidad:
+### Ejecutar por funcionalidad
+
+**Registro**
 
 ```bash
 mvn test -Dcucumber.filter.tags="@registration"
+```
+
+**Login**
+
+```bash
 mvn test -Dcucumber.filter.tags="@login"
+```
+
+**Transferencia**
+
+```bash
 mvn test -Dcucumber.filter.tags="@transfer"
+```
+
+**Retiro**
+
+```bash
 mvn test -Dcucumber.filter.tags="@withdrawal"
 ```
 
-Para ejecutar solamente las pruebas principales:
+### Ejecutar pruebas principales
 
 ```bash
 mvn test -Dcucumber.filter.tags="@smoke"
 ```
 
-También están disponibles:
+### Otros tags disponibles
 
 ```text
 @ui
@@ -87,64 +114,76 @@ También están disponibles:
 @sut_defect
 ```
 
-Los escenarios `@sut_defect` corresponden a problemas encontrados en el ambiente de ParaBank.
+Los escenarios marcados con `@sut_defect` corresponden a comportamientos identificados en el sistema bajo prueba y se mantienen separados de las pruebas funcionales principales.
 
 ---
 
-## QUÉ HACE LA PRUEBA
+## Estrategia de automatización
 
-Las pruebas de **registro, login y transferencia** se realizan mediante la interfaz utilizando Playwright.
+Las funcionalidades se automatizan de acuerdo con la forma en que están disponibles en ParaBank:
 
-El **retiro** se realiza mediante el servicio REST, ya que ParaBank no dispone de esta operación desde la interfaz.
+| Funcionalidad | Tipo de prueba |
+|---|---|
+| Registro | UI |
+| Login | UI |
+| Transferencia | UI |
+| Retiro | API |
+| Validación de saldos | API |
 
-Los saldos se comprueban mediante API para tener una referencia más confiable, ya que la pantalla `Accounts Overview` presenta problemas en el ambiente público.
+El registro, login y transferencia se realizan mediante la interfaz utilizando Playwright.
 
-Los escenarios utilizan datos generados automáticamente y cada uno mantiene su propio contexto para evitar dependencias entre pruebas.
+El retiro se realiza mediante API debido a que esta operación no está disponible desde la interfaz utilizada en el ejercicio.
 
----
+La validación de saldos se realiza mediante API para comprobar el resultado de las operaciones.
 
-## CRITERIOS QUE DEBE CUMPLIR
-
-* Los escenarios deben poder ejecutarse de forma independiente.
-* No se deben utilizar usuarios o cuentas fijas.
-* Los datos de prueba deben generarse automáticamente.
-* Los selectores deben estar dentro de los Page Objects.
-* Las operaciones de UI deben realizarse mediante Playwright.
-* Las operaciones que no existen en UI pueden realizarse mediante API.
-* Los saldos deben validarse contra el servicio REST.
-* Los fallos de UI deben dejar evidencia mediante captura de pantalla.
+De esta forma, la automatización combina pruebas **UI y API** de acuerdo con las características de cada funcionalidad.
 
 ---
 
-## DATOS DE PRUEBA
+## Buenas prácticas aplicadas
 
-Los datos se generan automáticamente durante la ejecución.
+El proyecto utiliza:
 
-La generación se encuentra principalmente en:
+- **Page Object Model (POM)** para separar los elementos de la interfaz de los escenarios.
+- **Cucumber / Gherkin** para describir los casos de prueba.
+- **Hooks** para administrar el ciclo de vida de los escenarios y generar evidencia cuando corresponde.
+- **Datos dinámicos** para reducir dependencias entre ejecuciones.
+- **Contexto por escenario** para mantener los datos utilizados durante una prueba.
+- **Separación de responsabilidades** entre Pages, Steps, API, datos y configuración.
+- **Tags de Cucumber** para ejecutar grupos específicos de pruebas.
+- **Reportes HTML y JSON** para facilitar la revisión de resultados.
+
+---
+
+## Datos de prueba
+
+Los datos utilizados durante las pruebas se generan durante la ejecución.
+
+La generación de datos se encuentra en:
 
 ```text
 src/test/java/com/pruebabg/data/GeneradorDeDatos
 ```
 
-El estado de cada escenario se mantiene mediante:
+El contexto utilizado para compartir información dentro de un escenario se encuentra en:
 
 ```text
 src/test/java/com/pruebabg/context/ContextoDelEscenario
 ```
 
-De esta manera, cada ejecución puede crear sus propios usuarios y trabajar con sus cuentas sin depender de datos anteriores.
+Esto permite que los escenarios trabajen con sus propios datos y evita depender, en la medida de lo posible, de información creada manualmente antes de ejecutar la suite.
 
 ---
 
-## ESTRUCTURA PRINCIPAL
+## Estructura del proyecto
 
 ```text
 src/test/java/com/pruebabg/
 ├── api/          Servicios REST
 ├── config/       Configuración
-├── context/      Estado del escenario
-├── data/         Datos de prueba
-├── driver/       Playwright
+├── context/      Contexto de los escenarios
+├── data/         Generación de datos
+├── driver/       Gestión de Playwright
 ├── hooks/        Hooks de Cucumber
 ├── model/        Modelos
 ├── pages/        Page Objects
@@ -158,15 +197,15 @@ src/test/resources/
 
 ---
 
-## DÓNDE QUEDAN LOS REPORTES
+## Reportes
 
-Los reportes se generan en:
+Los resultados de las pruebas se generan en:
 
 ```text
 target/cucumber-reports/
 ```
 
-Incluyen:
+Se generan los siguientes archivos:
 
 ```text
 reporte.html
@@ -175,18 +214,43 @@ reporte.xml
 timeline/
 ```
 
-El reporte HTML permite revisar los escenarios ejecutados y, cuando una prueba de interfaz falla, se adjunta una **captura de pantalla** como evidencia.
+El reporte HTML permite consultar los escenarios ejecutados y sus resultados.
+
+Cuando una prueba de interfaz falla, se adjunta una **captura de pantalla como evidencia**.
 
 ---
 
-## NOTAS
+## Hallazgos durante las pruebas
 
-Durante las pruebas se detectaron algunos problemas en el ambiente público de ParaBank, principalmente relacionados con el login y la pantalla `Accounts Overview`.
+Durante la ejecución se identificaron algunos comportamientos del ambiente público de ParaBank que se consideran defectos del sistema bajo prueba.
 
-Estos casos están identificados con `@sut_defect` para diferenciarlos de los errores propios de la automatización.
+Entre ellos:
 
-Para ejecutar la suite completa:
+- Comportamiento inesperado durante el inicio de sesión con credenciales inválidas.
+- Problemas en la visualización de la información de `Accounts Overview`.
+
+Estos escenarios se encuentran identificados mediante:
+
+```text
+@sut_defect
+```
+
+Esto permite diferenciarlos de posibles errores relacionados con la automatización.
+
+---
+
+## Ejecución de los defectos identificados
+
+Para ejecutar únicamente estos escenarios:
 
 ```bash
-mvn test
+mvn test -Dcucumber.filter.tags="@sut_defect"
 ```
+
+---
+
+## Consideraciones
+
+La ejecución depende de la disponibilidad del ambiente público de ParaBank. Algunos resultados pueden verse afectados por cambios o problemas propios del ambiente.
+
+Los escenarios identificados como `@sut_defect` corresponden a hallazgos realizados durante la ejecución y no necesariamente a problemas relacionados con el framework de automatización.
